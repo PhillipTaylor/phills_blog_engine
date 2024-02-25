@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <title>My Blog</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <script src="https://cdn.rawgit.com/showdownjs/showdown/1.8.0/dist/showdown.min.js"></script>
+    <style>
+      .row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+      .column {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 100%;
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+  <div class="row">
+    <h1>Banner</h1>
+  </div>
+  <div class="row">
+    <div id="post" class="column"></div>
+    <div id="sidebar" class="column">
+      <ul>
+        <li><a href="/?post=test.md">Blog Post 1</a></li>
+        <li><a href="/?post=test2.md">Blog Post 2</a></li>
+      </ul>
+    </div>
+  </div>
+  <script type="text/javascript">
+
+      function loadPost(postUrl) {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+              if (this.readyState == 4) {
+                if (this.status == 200) {
+                    const postMarkdown = this.responseText;
+                    renderPost(postMarkdown);
+                } else {
+                    console.log("failed with response: " + this.responseText);
+                }
+              }
+          };
+          xhttp.open("GET", "/posts/" + post, true);
+          console.log("Fetching Markdown for post: /posts/" + post);
+          xhttp.send();
+      }
+
+      function renderPost(postMarkdown) {
+          const converter = new showdown.Converter();
+          const postHtml = converter.makeHtml(postMarkdown);
+          document.getElementById('post').innerHTML = postHtml; 
+      }
+
+      // When the page loads look at the URL to decipher which post we are supposed
+      // to be showing?
+
+      const urlParams = new URLSearchParams(window.location.search);
+      var post = urlParams.get('post');
+
+      if (post == undefined || post == null) {
+        post = 'welcome.md';
+      }
+
+      loadPost(post);
+
+  </script>
+  </body>
+</html>
